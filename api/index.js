@@ -24,13 +24,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.get('/', (req, res) => {
-	res.send('Express on Vercel');
-});
+// app.get('/', (req, res) => {
+// 	res.send('Express on Vercel');
+// });
 
-app.get('/api/v1/comprobantes', (req, res) => {
-	res.json({ code: 200, message: 'Comprobante', data: {} });
-});
+// app.get('/api/v1/comprobantes', (req, res) => {
+// 	res.json({ code: 200, message: 'Comprobante', data: {} });
+// });
 
 app.post('/api/form-contact', autenticar, handleFormContact);
 
