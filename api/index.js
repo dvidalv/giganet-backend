@@ -1,8 +1,8 @@
 const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
-
-
+const {handleFormContact} = require('./mail')
+const { autenticar } = require('../utils/auth');
 const app = express();
 app.use(express.json());
 
@@ -29,6 +29,8 @@ app.get('/', (req, res) => {
 app.get('/api/v1/comprobantes', (req, res) => {
 	res.json({ code: 200, message: 'Comprobante', data: {} });
 });
+
+app.post('/api/form-contact', autenticar, handleFormContact);
 
 const PORT = process.env.PORT || 3001;
 
