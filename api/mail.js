@@ -5,36 +5,84 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 
 const handleFormContact = async (req, res) => {
-  const { nombre, telefono, email, mensaje, location } = req.body;
-  
-  const msg = {
-    to: 'dvidalv@gmail.com', // Email donde quieres recibir los mensajes
-    from: 'dvidalv@gmail.com', // Email verificado en SendGrid
-    subject: 'Nuevo mensaje de Giganet',
-    html: `
-      <h3>Nuevo mensaje de contacto</h3>
-      <p><strong>Nombre:</strong> ${nombre}</p>
-      <p><strong>Teléfono:</strong> ${telefono}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Mensaje:</strong> ${mensaje}</p>
-      <p><strong>Ubicación:</strong> ${location}</p>
-    `
-  };
-
   try {
-    await sgMail.send(msg);
+    // Validación de datos de entrada
+    const { nombre, telefono, email, mensaje, location } = req.body;
+    
+    // Log para debugging
+    console.log('Datos recibidos:', {
+      nombre,
+      telefono,
+      email,
+      mensaje,
+      location,
+      userAgent: req.headers['user-agent'],
+      timestamp: new Date().toISOString()
+    });
+
+    // Validar que todos los campos necesarios existan
+    if (!nombre || !email || !mensaje) {
+      console.log('Faltan campos requeridos:', { nombre, email, mensaje });
+      return res.status(400).json({
+        code: 400,
+        message: 'Faltan campos requeridos',
+        data: { nombre, email, mensaje }
+      });
+    }
+
+    const msg = {
+      to: 'dvidalv@gmail.com',
+      from: 'dvidalv@gmail.com',
+      subject: 'Nuevo mensaje de Giganet',
+      html: `
+        <h3>Nuevo mensaje de contacto</h3>
+        <p><strong>Nombre:</strong> ${nombre}</p>
+        <p><strong>Teléfono:</strong> ${telefono || 'No proporcionado'}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Mensaje:</strong> ${mensaje}</p>
+        <p><strong>Ubicación:</strong> ${location || 'No proporcionada'}</p>
+        <p><strong>Dispositivo:</strong> ${req.headers['user-agent']}</p>
+        <p><strong>Fecha:</strong> ${new Date().toLocaleString()}</p>
+      `,
+      // Agregar texto plano como fallback
+      text: `
+        Nuevo mensaje de contacto
+        Nombre: ${nombre}
+        Teléfono: ${telefono || 'No proporcionado'}
+        Email: ${email}
+        Mensaje: ${mensaje}
+        Ubicación: ${location || 'No proporcionada'}
+        Dispositivo: ${req.headers['user-agent']}
+        Fecha: ${new Date().toLocaleString()}
+      `
+    };
+
+    // Intentar enviar el email
+    const response = await sgMail.send(msg);
+    console.log('Email enviado exitosamente:', response);
     
     res.json({
       code: 200,
       message: 'Datos recibidos y email enviado correctamente',
-      data: { nombre, telefono, email, mensaje, location },
+      data: { nombre, telefono, email, mensaje, location }
     });
+
   } catch (error) {
-    console.error('Error al enviar email:', error);
+    // Log detallado del error
+    console.error('Error completo:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response?.body,
+      timestamp: new Date().toISOString()
+    });
+
     res.status(500).json({
       code: 500,
       message: 'Error al enviar el email',
-      error: error.message
+      error: {
+        message: error.message,
+        details: error.response?.body
+      }
     });
   }
 };
