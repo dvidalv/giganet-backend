@@ -15,6 +15,7 @@ const corsOptions = {
 		'http://localhost:5174',
 		'https://giganet-backend.vercel.app',
 		'https://www.giganet-srl.com',
+		'https://www.giganet-srl.com/contact',
 	],
 	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 	preflightContinue: false,
