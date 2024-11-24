@@ -8,21 +8,9 @@ const handleFormContact = async (req, res) => {
   try {
     // Validación de datos de entrada
     const { nombre, telefono, email, mensaje, location } = req.body;
-    
-    // Log para debugging
-    console.log('Datos recibidos:', {
-      nombre,
-      telefono,
-      email,
-      mensaje,
-      location,
-      userAgent: req.headers['user-agent'],
-      timestamp: new Date().toISOString()
-    });
 
     // Validar que todos los campos necesarios existan
     if (!nombre || !email || !mensaje) {
-      console.log('Faltan campos requeridos:', { nombre, email, mensaje });
       return res.status(400).json({
         code: 400,
         message: 'Faltan campos requeridos',
@@ -59,7 +47,6 @@ const handleFormContact = async (req, res) => {
 
     // Intentar enviar el email
     const response = await sgMail.send(msg);
-    console.log('Email enviado exitosamente:', response);
     
     res.json({
       code: 200,
