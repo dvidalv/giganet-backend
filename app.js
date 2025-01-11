@@ -1,5 +1,7 @@
 const express = require('express');
+const { handleFormContact } = require('./api/mail');
 const cors = require('cors');
+const usersRouter = require('./routes/users');
 require('dotenv').config();
 const connectDB = require('./config/db');
 
@@ -20,8 +22,10 @@ connectDB();
 app.use(express.json());
 
 // Rutas
-const usersRouter = require('./routes/users');
 app.use('/api/users', usersRouter);
+app.use('/api/form-contact', handleFormContact);
+
+
 
 // Manejo de errores global
 app.use((err, req, res, next) => {
