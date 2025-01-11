@@ -1,10 +1,17 @@
 const express = require('express');
+
 require('dotenv').config();
 const cors = require('cors');
-const {handleFormContact} = require('./mail')
-const { autenticar } = require('../utils/auth');
+
+const usersRouter = require('../routes/users');
+
+const { handleFormContact } = require('./mail');
+const { handleFormContactAdmin } = require('../utils/auth');
 const app = express();
+
 app.use(express.json());
+
+
 
 const corsOptions = {
 	allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
@@ -24,15 +31,18 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// app.get('/', (req, res) => {
-// 	res.send('Express on Vercel');
-// });
+// Deshabilitar caché en desarrollo
+if (process.env.NODE_ENV === 'development') {
+	app.set('etag', false);
+	app.use((req, res, next) => {
+		res.set('Cache-Control', 'no-store');
+		next();
+	});
+}
 
-// app.get('/api/v1/comprobantes', (req, res) => {
-// 	res.json({ code: 200, message: 'Comprobante', data: {} });
-// });
+app.post('/api/form-contact', handleFormContact);
 
-app.post('/api/form-contact', autenticar, handleFormContact);
+app.use('/api/users', usersRouter);
 
 const PORT = process.env.PORT || 3001;
 

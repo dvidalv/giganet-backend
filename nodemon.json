@@ -1,5 +1,7 @@
 {
-  "watch": ["api/"],
-  "ext": "js,json",
-  "ignore": ["node_modules/", ".git/"]
+	"watch": [".", "api/", "utils/"],
+	"ext": "js,json,env",
+	"ignore": ["node_modules/", ".git/", "*.test.js"],
+	"verbose": true,
+	"delay": "500"
 }
