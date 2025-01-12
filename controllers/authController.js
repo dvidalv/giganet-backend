@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 // Registro de usuario
 exports.register = async (req, res) => {
 	try {
+		console.log('Iniciando registro de usuario');
 		const { email, password } = req.body;
 
 		// Verificar si el usuario ya existe
@@ -40,6 +41,11 @@ exports.register = async (req, res) => {
 			},
 		});
 	} catch (error) {
+		console.error('Error detallado:', {
+			message: error.message,
+			stack: error.stack,
+			timestamp: new Date().toISOString(),
+		});
 		res.status(500).json({
 			isSuccess: false,
 			data: {
