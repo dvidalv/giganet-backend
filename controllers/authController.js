@@ -1,3 +1,4 @@
+const dbConnect = require('../config/db');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -58,21 +59,31 @@ exports.register = async (req, res) => {
 
 // Login de usuario
 exports.login = async (req, res) => {
-	console.log('Iniciando login de usuario');
+	console.log('Iniciando proceso de login:', new Date().toISOString());
+
 	try {
+		// Intentar establecer conexión explícitamente
+		console.log('Intentando conectar a la base de datos...');
+		const mongoose = await dbConnect();
+
+		// Verificar el estado de la conexión
+		console.log('Estado de conexión:', {
+			readyState: mongoose.connection.readyState,
+			timestamp: new Date().toISOString(),
+		});
+
 		const { email, password } = req.body;
 
-		console.log('Intentando buscar usuario en la base de datos...');
-		// Verificar si el usuario existe con timeout explícito
-		const user = await User.findOne({ email }).maxTimeMS(15000); // Aumentamos el timeout a 15 segundos
-
-		console.log(
-			'Resultado de búsqueda:',
-			user ? 'Usuario encontrado' : 'Usuario no encontrado'
-		);
+		// Agregar timeout explícito para la operación de búsqueda
+		const user = await Promise.race([
+			User.findOne({ email }).exec(),
+			new Promise((_, reject) =>
+				setTimeout(() => reject(new Error('Timeout al buscar usuario')), 15000)
+			),
+		]);
 
 		if (!user) {
-			console.log('Usuario no encontrado');
+			console.log('Usuario no encontrado:', email);
 			return res.status(400).json({
 				isSuccess: false,
 				data: {
@@ -112,15 +123,20 @@ exports.login = async (req, res) => {
 			name: error.name,
 			stack: error.stack,
 			timestamp: new Date().toISOString(),
+			mongooseState: mongoose?.connection?.readyState,
 		});
 
-		// Mensaje de error más específico
-		const errorMessage =
-			error.name === 'MongooseError'
-				? 'Error de conexión con la base de datos. Por favor, intente nuevamente.'
-				: error.message;
+		// Mensaje de error más específico basado en el tipo de error
+		let errorMessage = 'Error interno del servidor';
+		if (error.message.includes('buffering timed out')) {
+			errorMessage =
+				'Error de conexión con la base de datos. Por favor, intente nuevamente en unos momentos.';
+		} else if (error.message === 'Timeout al buscar usuario') {
+			errorMessage =
+				'La operación tardó demasiado tiempo. Por favor, intente nuevamente.';
+		}
 
-		res.status(500).json({
+		return res.status(500).json({
 			isSuccess: false,
 			data: {
 				message: errorMessage,

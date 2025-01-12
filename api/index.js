@@ -11,8 +11,6 @@ const app = express();
 
 app.use(express.json());
 
-
-
 const corsOptions = {
 	allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
 	origin: [
@@ -43,6 +41,23 @@ if (process.env.NODE_ENV === 'development') {
 app.post('/api/form-contact', handleFormContact);
 
 app.use('/api/users', usersRouter);
+
+app.get('/api/db-status', async (req, res) => {
+	try {
+		const mongoose = await dbConnect();
+		res.json({
+			status: 'ok',
+			readyState: mongoose.connection.readyState,
+			timestamp: new Date().toISOString(),
+		});
+	} catch (error) {
+		res.status(500).json({
+			status: 'error',
+			error: error.message,
+			timestamp: new Date().toISOString(),
+		});
+	}
+});
 
 const PORT = process.env.PORT || 3001;
 

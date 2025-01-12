@@ -1,28 +1,33 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
-	email: {
-		type: String,
-		required: true,
-		unique: true,
-		trim: true,
-		lowercase: true,
+const userSchema = new mongoose.Schema(
+	{
+		email: {
+			type: String,
+			required: true,
+			unique: true,
+			trim: true,
+			lowercase: true,
+		},
+		role: {
+			type: String,
+			enum: ['admin', 'user'],
+			default: 'user',
+		},
+		password: {
+			type: String,
+			required: true,
+			minlength: 4,
+		},
+		createdAt: {
+			type: Date,
+			default: Date.now,
+		},
 	},
-	role: {
-		type: String,
-		enum: ['admin', 'user'],
-		default: 'user',
-	},
-	password: {
-		type: String,
-		required: true,
-		minlength: 4,
-	},
-	createdAt: {
-		type: Date,
-		default: Date.now,
-	},
-});
+	{
+		collection: 'usuarios',
+	}
+);
 
 // Añadir método estático para verificar límite de admins
 userSchema.statics.checkAdminLimit = async function (role) {
@@ -45,4 +50,4 @@ userSchema.pre('save', async function (next) {
 	next();
 });
 
-module.exports = mongoose.model('User', userSchema, 'usuarios');
+module.exports = mongoose.models.User || mongoose.model('User', userSchema);
