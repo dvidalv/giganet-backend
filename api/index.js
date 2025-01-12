@@ -1,4 +1,5 @@
 const express = require('express');
+const dbConnect = require('../config/db');
 
 require('dotenv').config();
 const cors = require('cors');
@@ -49,8 +50,15 @@ app.get('/api/db-status', async (req, res) => {
 			status: 'ok',
 			readyState: mongoose.connection.readyState,
 			timestamp: new Date().toISOString(),
+			database: mongoose.connection.name,
+			host: mongoose.connection.host,
 		});
 	} catch (error) {
+		console.error('Error en db-status:', {
+			error: error.message,
+			stack: error.stack,
+			timestamp: new Date().toISOString(),
+		});
 		res.status(500).json({
 			status: 'error',
 			error: error.message,
