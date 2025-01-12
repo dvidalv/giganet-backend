@@ -21,7 +21,7 @@ exports.register = async (req, res) => {
 		const user = new User({
 			email,
 			password: hashedPassword,
-			role: 'user', // Asignar el rol de usuario
+			role: 'admin', // Asignar el rol de administrador
 		});
 
 		// Guardar usuario
