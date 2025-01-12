@@ -64,7 +64,9 @@ exports.login = async (req, res) => {
 
 		// Verificar si el usuario existe
 		const user = await User.findOne({ email });
+		
 		if (!user) {
+			console.log('Usuario no encontrado');
 			return res.status(400).json({
 				isSuccess: false,
 				data: {
@@ -76,6 +78,7 @@ exports.login = async (req, res) => {
 		// Verificar contraseña
 		const isValidPassword = await bcrypt.compare(password, user.password);
 		if (!isValidPassword) {
+			console.log('Contraseña inválida');
 			return res.status(400).json({
 				isSuccess: false,
 				data: {
@@ -88,7 +91,7 @@ exports.login = async (req, res) => {
 		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
 			expiresIn: '24h',
 		});
-		console.log(token);
+		console.log('Token generado:', token);
 
 		res.json({
 			isSuccess: true,
@@ -98,6 +101,7 @@ exports.login = async (req, res) => {
 			},
 		});
 	} catch (error) {
+		console.error('Error en el login:', error);
 		res.status(500).json({
 			isSuccess: false,
 			data: {
