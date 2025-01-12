@@ -16,12 +16,39 @@ console.log('MongoDB URI existe:', !!process.env.MONGODB_URI);
 // Configuración de CORS
 app.use(
 	cors({
-		origin: ['http://localhost:5173'], // Simplificamos CORS por ahora
+		origin: [
+			'http://localhost:5173', // desarrollo local
+			'https://giganet-backend.vercel.app',
+			'https://www.giganet-srl.com',
+			'https://giganet-srl.com', // sin www también
+			'https://giganet-srl.com/',
+			'https://www.giganet-srl.com/',
+		],
 		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-		allowedHeaders: ['Content-Type', 'Authorization'],
+		allowedHeaders: [
+			'Content-Type',
+			'Authorization',
+			'Origin',
+			'X-Requested-With',
+			'Accept',
+		],
 		credentials: true,
+		preflightContinue: false,
+		optionsSuccessStatus: 204,
 	})
 );
+
+// Middleware adicional para headers de CORS
+app.use((req, res, next) => {
+	res.header('Access-Control-Allow-Origin', 'https://www.giganet-srl.com');
+	res.header('Access-Control-Allow-Credentials', 'true');
+	res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+	res.header(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+	);
+	next();
+});
 
 // Middleware
 app.use(express.json());
