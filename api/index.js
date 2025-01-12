@@ -1,76 +1,68 @@
-// const express = require('express');
-// const dbConnect = require('../config/db');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-// require('dotenv').config();
-// const cors = require('cors');
+const express = require('express');
+const cors = require('cors');
+const usersRouter = require('../routes/users');
+const { handleFormContact } = require('./mail');
+const { dbConnect } = require('../config/db');
 
-// const usersRouter = require('../routes/users');
+const app = express();
 
-// const { handleFormContact } = require('./mail');
-// const { handleFormContactAdmin } = require('../utils/auth');
-// const app = express();
+// Logs iniciales
+console.log('🚀 Iniciando servidor...');
+console.log('MongoDB URI existe:', !!process.env.MONGODB_URI);
 
-// app.use(express.json());
+// Configuración de CORS
+app.use(
+	cors({
+		origin: ['http://localhost:5173'], // Simplificamos CORS por ahora
+		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+		allowedHeaders: ['Content-Type', 'Authorization'],
+		credentials: true,
+	})
+);
 
-// const corsOptions = {
-// 	allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-// 	origin: [
-// 		'http://localhost:3000',
-// 		'http://localhost:3001',
-// 		'http://localhost:5173',
-// 		'http://localhost:5174',
-// 		'https://giganet-backend.vercel.app',
-// 		'https://www.giganet-srl.com',
-// 		'https://www.giganet-srl.com/contact',
-// 	],
-// 	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-// 	preflightContinue: false,
-// 	optionsSuccessStatus: 204,
-// };
+// Middleware
+app.use(express.json());
 
-// app.use(cors(corsOptions));
+// Ruta de prueba
+app.get('/api/test', (req, res) => {
+	res.json({ message: 'API funcionando correctamente' });
+});
 
-// // Deshabilitar caché en desarrollo
-// if (process.env.NODE_ENV === 'development') {
-// 	app.set('etag', false);
-// 	app.use((req, res, next) => {
-// 		res.set('Cache-Control', 'no-store');
-// 		next();
-// 	});
-// }
+// Rutas principales
+app.use('/api/users', usersRouter);
+app.post('/api/form-contact', handleFormContact);
 
-// app.post('/api/form-contact', handleFormContact);
+// Conexión a la base de datos
+dbConnect()
+	.then(() => {
+		console.log('✅ Base de datos conectada');
+	})
+	.catch((err) => {
+		console.error('❌ Error conectando a la base de datos:', err);
+	});
 
-// app.use('/api/users', usersRouter);
+// Manejo de errores global
+app.use((err, req, res, next) => {
+	console.error('❌ Error:', err);
+	res.status(500).json({ message: 'Algo salió mal!' });
+});
 
-// app.get('/api/db-status', async (req, res) => {
-// 	try {
-// 		const mongoose = await dbConnect();
-// 		res.json({
-// 			status: 'ok',
-// 			readyState: mongoose.connection.readyState,
-// 			timestamp: new Date().toISOString(),
-// 			database: mongoose.connection.name,
-// 			host: mongoose.connection.host,
-// 		});
-// 	} catch (error) {
-// 		console.error('Error en db-status:', {
-// 			error: error.message,
-// 			stack: error.stack,
-// 			timestamp: new Date().toISOString(),
-// 		});
-// 		res.status(500).json({
-// 			status: 'error',
-// 			error: error.message,
-// 			timestamp: new Date().toISOString(),
-// 		});
-// 	}
-// });
+// Iniciar servidor
+const PORT = process.env.PORT || 3000;
+const server = app.listen(PORT, () => {
+	console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+});
 
-// const PORT = process.env.PORT || 3001;
+// Manejo de errores del servidor
+server.on('error', (err) => {
+	if (err.code === 'EADDRINUSE') {
+		console.error(`❌ El puerto ${PORT} está en uso. Intenta con otro puerto.`);
+	} else {
+		console.error('❌ Error en el servidor:', err);
+	}
+});
 
-// app.listen(PORT, () => {
-// 	console.log(`Server is running on port ${PORT}`);
-// });
-
-// module.exports = app;
+module.exports = app;

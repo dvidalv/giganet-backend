@@ -1,4 +1,4 @@
-const dbConnect = require('../config/db');
+const {dbConnect} = require('../config/db');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -59,14 +59,14 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
 	try {
 		// Intentar establecer conexión explícitamente
-		console.log('Intentando conectar a la base de datos...');
+		// console.log('Intentando conectar a la base de datos...');
 		const mongoose = await dbConnect();
 
 		// Verificar el estado de la conexión
-		console.log('Estado de conexión:', {
-			readyState: mongoose.connection.readyState,
-			timestamp: new Date().toISOString(),
-		});
+		// console.log('Estado de conexión:', {
+		// 	readyState: mongoose.connection.readyState,
+		// 	timestamp: new Date().toISOString(),
+		// });
 
 		const { email, password } = req.body;
 
@@ -79,7 +79,7 @@ exports.login = async (req, res) => {
 		]);
 
 		if (!user) {
-			console.log('Usuario no encontrado:', email);
+			// console.log('Usuario no encontrado:', email);
 			return res.status(400).json({
 				isSuccess: false,
 				data: {
@@ -91,7 +91,7 @@ exports.login = async (req, res) => {
 		// Verificar contraseña
 		const isValidPassword = await bcrypt.compare(password, user.password);
 		if (!isValidPassword) {
-			console.log('Contraseña inválida');
+			// console.log('Contraseña inválida');
 			return res.status(400).json({
 				isSuccess: false,
 				data: {
@@ -104,7 +104,7 @@ exports.login = async (req, res) => {
 		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
 			expiresIn: '24h',
 		});
-		console.log('Token generado:', token);
+		// console.log('Token generado:', token);
 
 		res.json({
 			isSuccess: true,
