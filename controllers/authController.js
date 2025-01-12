@@ -62,9 +62,15 @@ exports.login = async (req, res) => {
 	try {
 		const { email, password } = req.body;
 
-		// Verificar si el usuario existe
-		const user = await User.findOne({ email });
-		
+		console.log('Intentando buscar usuario en la base de datos...');
+		// Verificar si el usuario existe con timeout explícito
+		const user = await User.findOne({ email }).maxTimeMS(15000); // Aumentamos el timeout a 15 segundos
+
+		console.log(
+			'Resultado de búsqueda:',
+			user ? 'Usuario encontrado' : 'Usuario no encontrado'
+		);
+
 		if (!user) {
 			console.log('Usuario no encontrado');
 			return res.status(400).json({
@@ -101,11 +107,23 @@ exports.login = async (req, res) => {
 			},
 		});
 	} catch (error) {
-		console.error('Error en el login:', error);
+		console.error('Error detallado en el login:', {
+			message: error.message,
+			name: error.name,
+			stack: error.stack,
+			timestamp: new Date().toISOString(),
+		});
+
+		// Mensaje de error más específico
+		const errorMessage =
+			error.name === 'MongooseError'
+				? 'Error de conexión con la base de datos. Por favor, intente nuevamente.'
+				: error.message;
+
 		res.status(500).json({
 			isSuccess: false,
 			data: {
-				message: error.message,
+				message: errorMessage,
 			},
 		});
 	}
