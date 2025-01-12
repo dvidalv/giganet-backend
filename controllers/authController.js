@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
 		}
 
 		// Encriptar contraseña
-		const salt = await bcrypt.genSalt(10); // Generar un salt aleatorio
+		const salt = await bcrypt.genSalt(8); // Generar un salt aleatorio
 		const hashedPassword = await bcrypt.hash(password, salt); // Encriptar la contraseña con el salt
 
 		// Crear nuevo usuario
@@ -86,7 +86,7 @@ exports.login = async (req, res) => {
 			data: {
 				token,
 				message: 'Login exitoso',
-			},	
+			},
 		});
 	} catch (error) {
 		res.status(500).json({
