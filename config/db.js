@@ -16,7 +16,6 @@ if (!cached) {
 
 async function dbConnect() {
 	if (cached.conn) {
-		console.log('Usando conexión existente');
 		return cached.conn;
 	}
 
@@ -87,4 +86,28 @@ mongoose.connection.on('error', (err) => {
 	});
 });
 
-module.exports = dbConnect;
+async function testConnection (req, res)  {
+		try {
+			const mongoose = await dbConnect();
+			res.json({
+				status: 'ok',
+				readyState: mongoose.connection.readyState,
+				timestamp: new Date().toISOString(),
+				database: mongoose.connection.name,
+				host: mongoose.connection.host,
+			});
+		} catch (error) {
+			console.error('Error en db-status:', {
+				error: error.message,
+				stack: error.stack,
+				timestamp: new Date().toISOString(),
+			});
+			res.status(500).json({
+				status: 'error',
+				error: error.message,
+				timestamp: new Date().toISOString(),
+		});
+	}
+}
+
+module.exports = { dbConnect, testConnection };

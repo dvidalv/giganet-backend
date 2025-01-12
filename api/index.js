@@ -1,76 +1,76 @@
-const express = require('express');
-const dbConnect = require('../config/db');
+// const express = require('express');
+// const dbConnect = require('../config/db');
 
-require('dotenv').config();
-const cors = require('cors');
+// require('dotenv').config();
+// const cors = require('cors');
 
-const usersRouter = require('../routes/users');
+// const usersRouter = require('../routes/users');
 
-const { handleFormContact } = require('./mail');
-const { handleFormContactAdmin } = require('../utils/auth');
-const app = express();
+// const { handleFormContact } = require('./mail');
+// const { handleFormContactAdmin } = require('../utils/auth');
+// const app = express();
 
-app.use(express.json());
+// app.use(express.json());
 
-const corsOptions = {
-	allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-	origin: [
-		'http://localhost:3000',
-		'http://localhost:3001',
-		'http://localhost:5173',
-		'http://localhost:5174',
-		'https://giganet-backend.vercel.app',
-		'https://www.giganet-srl.com',
-		'https://www.giganet-srl.com/contact',
-	],
-	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-	preflightContinue: false,
-	optionsSuccessStatus: 204,
-};
+// const corsOptions = {
+// 	allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+// 	origin: [
+// 		'http://localhost:3000',
+// 		'http://localhost:3001',
+// 		'http://localhost:5173',
+// 		'http://localhost:5174',
+// 		'https://giganet-backend.vercel.app',
+// 		'https://www.giganet-srl.com',
+// 		'https://www.giganet-srl.com/contact',
+// 	],
+// 	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+// 	preflightContinue: false,
+// 	optionsSuccessStatus: 204,
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
-// Deshabilitar caché en desarrollo
-if (process.env.NODE_ENV === 'development') {
-	app.set('etag', false);
-	app.use((req, res, next) => {
-		res.set('Cache-Control', 'no-store');
-		next();
-	});
-}
+// // Deshabilitar caché en desarrollo
+// if (process.env.NODE_ENV === 'development') {
+// 	app.set('etag', false);
+// 	app.use((req, res, next) => {
+// 		res.set('Cache-Control', 'no-store');
+// 		next();
+// 	});
+// }
 
-app.post('/api/form-contact', handleFormContact);
+// app.post('/api/form-contact', handleFormContact);
 
-app.use('/api/users', usersRouter);
+// app.use('/api/users', usersRouter);
 
-app.get('/api/db-status', async (req, res) => {
-	try {
-		const mongoose = await dbConnect();
-		res.json({
-			status: 'ok',
-			readyState: mongoose.connection.readyState,
-			timestamp: new Date().toISOString(),
-			database: mongoose.connection.name,
-			host: mongoose.connection.host,
-		});
-	} catch (error) {
-		console.error('Error en db-status:', {
-			error: error.message,
-			stack: error.stack,
-			timestamp: new Date().toISOString(),
-		});
-		res.status(500).json({
-			status: 'error',
-			error: error.message,
-			timestamp: new Date().toISOString(),
-		});
-	}
-});
+// app.get('/api/db-status', async (req, res) => {
+// 	try {
+// 		const mongoose = await dbConnect();
+// 		res.json({
+// 			status: 'ok',
+// 			readyState: mongoose.connection.readyState,
+// 			timestamp: new Date().toISOString(),
+// 			database: mongoose.connection.name,
+// 			host: mongoose.connection.host,
+// 		});
+// 	} catch (error) {
+// 		console.error('Error en db-status:', {
+// 			error: error.message,
+// 			stack: error.stack,
+// 			timestamp: new Date().toISOString(),
+// 		});
+// 		res.status(500).json({
+// 			status: 'error',
+// 			error: error.message,
+// 			timestamp: new Date().toISOString(),
+// 		});
+// 	}
+// });
 
-const PORT = process.env.PORT || 3001;
+// const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+// 	console.log(`Server is running on port ${PORT}`);
+// });
 
-module.exports = app;
+// module.exports = app;

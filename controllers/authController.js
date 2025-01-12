@@ -5,9 +5,7 @@ const jwt = require('jsonwebtoken');
 
 // Registro de usuario
 exports.register = async (req, res) => {
-	console.log('Iniciando registro de usuario');
 	try {
-		console.log('Iniciando registro de usuario');
 		const { email, password } = req.body;
 
 		// Verificar si el usuario ya existe
@@ -59,8 +57,6 @@ exports.register = async (req, res) => {
 
 // Login de usuario
 exports.login = async (req, res) => {
-	console.log('Iniciando proceso de login:', new Date().toISOString());
-
 	try {
 		// Intentar establecer conexión explícitamente
 		console.log('Intentando conectar a la base de datos...');

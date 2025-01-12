@@ -3,7 +3,7 @@ const { handleFormContact } = require('./api/mail');
 const cors = require('cors');
 const usersRouter = require('./routes/users');
 require('dotenv').config();
-const connectDB = require('./config/db');
+const { dbConnect } = require('./config/db');
 
 const app = express();
 
@@ -12,7 +12,13 @@ app.use(
 	cors({
 		origin: [
 			'http://localhost:5173',
-			'https://giganet-backend.vercel.app/',
+			'https://giganet-backend.vercel.app',
+			'https://www.giganet-srl.com',
+			'https://www.giganet-srl.com/contact',
+			'https://www.giganet-srl.com/about',
+			'https://www.giganet-srl.com/services',
+			'https://www.giganet-srl.com/blog',
+			'https://www.giganet-srl.com/contact',
 		],
 		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 		allowedHeaders: ['Content-Type', 'Authorization'],
@@ -21,7 +27,7 @@ app.use(
 );
 
 // Conectar a MongoDB
-connectDB();
+dbConnect();
 
 // Middleware
 app.use(express.json());

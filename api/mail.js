@@ -70,7 +70,7 @@ const handleFormContact = async (req, res) => {
 
 		const response = await sgMail.send(msg);
 
-		// Agregar logging después del envío exitoso
+		// Mantener este log ya que es importante para tracking
 		console.log('Respuesta de SendGrid:', {
 			statusCode: response[0].statusCode,
 			headers: response[0].headers,
@@ -84,7 +84,7 @@ const handleFormContact = async (req, res) => {
 			data: { nombre, telefono, email, mensaje, locationStatus },
 		});
 	} catch (error) {
-		// Mejorar el logging de error
+		// Mantener este log ya que es crítico para debugging
 		console.error('Error al enviar email:', {
 			message: error.message,
 			code: error.code,
