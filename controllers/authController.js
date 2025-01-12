@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 // Registro de usuario
 exports.register = async (req, res) => {
+	console.log('Iniciando registro de usuario');
 	try {
 		console.log('Iniciando registro de usuario');
 		const { email, password } = req.body;
@@ -22,7 +23,7 @@ exports.register = async (req, res) => {
 		const user = new User({
 			email,
 			password: hashedPassword,
-			role: 'admin', // Asignar el rol de administrador
+			role: 'user', // Asignar el rol de usuario
 		});
 
 		// Guardar usuario
@@ -57,6 +58,7 @@ exports.register = async (req, res) => {
 
 // Login de usuario
 exports.login = async (req, res) => {
+	console.log('Iniciando login de usuario');
 	try {
 		const { email, password } = req.body;
 
@@ -86,6 +88,7 @@ exports.login = async (req, res) => {
 		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
 			expiresIn: '24h',
 		});
+		console.log(token);
 
 		res.json({
 			isSuccess: true,
@@ -103,3 +106,5 @@ exports.login = async (req, res) => {
 		});
 	}
 };
+
+// ... existing code ...
