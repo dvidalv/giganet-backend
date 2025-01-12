@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 
 // Registro de usuario
 exports.register = async (req, res) => {
-
 	try {
 		const { email, password } = req.body;
 
@@ -22,7 +21,7 @@ exports.register = async (req, res) => {
 		const user = new User({
 			email,
 			password: hashedPassword,
-
+			role: 'user', // Asignar el rol de usuario
 		});
 
 		// Guardar usuario
