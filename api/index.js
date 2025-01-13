@@ -14,16 +14,30 @@ console.log('🚀 Iniciando servidor...');
 console.log('MongoDB URI existe:', !!process.env.MONGODB_URI);
 
 // Configuración de CORS
+app.use((req, res, next) => {
+	console.log('Request headers:', req.headers);
+	console.log('Request origin:', req.headers.origin);
+	next();
+});
+
 app.use(
 	cors({
-		origin: [
-			'http://localhost:5173', // desarrollo local
-			'https://giganet-backend.vercel.app',
-			'https://www.giganet-srl.com',
-			'https://giganet-srl.com', // sin www también
-			'https://giganet-srl.com/',
-			'https://www.giganet-srl.com/',
-		],
+		origin: function (origin, callback) {
+			const allowedOrigins = [
+				'http://localhost:5173',
+				'http://localhost:3000',
+				'https://giganet-backend.vercel.app',
+				'https://www.giganet-srl.com',
+				'https://giganet-srl.com',
+			];
+
+			if (!origin || allowedOrigins.includes(origin)) {
+				callback(null, true);
+			} else {
+				callback(new Error('No permitido por CORS'));
+			}
+		},
+		credentials: true,
 		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 		allowedHeaders: [
 			'Content-Type',
@@ -32,23 +46,8 @@ app.use(
 			'X-Requested-With',
 			'Accept',
 		],
-		credentials: true,
-		preflightContinue: false,
-		optionsSuccessStatus: 204,
 	})
 );
-
-// Middleware adicional para headers de CORS
-app.use((req, res, next) => {
-	res.header('Access-Control-Allow-Origin', 'https://www.giganet-srl.com');
-	res.header('Access-Control-Allow-Credentials', 'true');
-	res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-	res.header(
-		'Access-Control-Allow-Headers',
-		'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-	);
-	next();
-});
 
 // Middleware
 app.use(express.json());
